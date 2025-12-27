@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEC International - Competitor Intelligence Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .logo-text span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-group label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        input[type="number"] {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            width: 80px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+        }
+        
+        .stat-value.blue { color: var(--accent-blue); }
+        .stat-value.green { color: var(--accent-green); }
+        .stat-value.orange { color: var(--accent-orange); }
+        .stat-value.purple { color: var(--accent-purple); }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .chart-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title .badge {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .news-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .news-section-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .category-icon.financials { background: rgba(88, 166, 255, 0.2); }
+        .category-icon.orders { background: rgba(63, 185, 80, 0.2); }
+        .category-icon.projects { background: rgba(210, 153, 34, 0.2); }
+        .category-icon.leadership { background: rgba(163, 113, 247, 0.2); }
+        .category-icon.ma { background: rgba(248, 81, 73, 0.2); }
+        .category-icon.regulatory { background: rgba(139, 148, 158, 0.2); }
+        .category-icon.operations { background: rgba(56, 139, 253, 0.2); }
+        
+        .news-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .news-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-item:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .news-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .news-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            line-height: 1.4;
+        }
+        
+        .news-title:hover {
+            color: var(--accent-blue);
+        }
+        
+        .news-date {
+            color: var(--text-secondary);
+            font-size: 12px;
+            white-space: nowrap;
+            margin-left: 16px;
+        }
+        
+        .news-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .tag.competitor {
+            background: rgba(88, 166, 255, 0.2);
+            color: var(--accent-blue);
+        }
+        
+        .tag.bu {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--accent-green);
+        }
+        
+        .filters {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .filter-group label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 180px;
+        }
+        
+        .all-news-list {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        .all-news-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .results-count {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        .timestamp {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-align: center;
+            padding: 16px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">CI</div>
+                <div class="logo-text">
+                    <h1>Competitor Intelligence Hub</h1>
+                    <span>KEC International | T&D, EPC & Infrastructure</span>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Days Lookback:</label>
+                    <input type="number" id="daysLookback" value="30" min="1" max="365">
+                </div>
+                <button class="btn" onclick="scanNews()">Scan</button>
+                <button class="btn btn-secondary" onclick="refreshData()">Refresh</button>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('executive')">Executive Dashboard</button>
+            <button class="tab" onclick="showTab('detailed')">Detailed News</button>
+        </div>
+        
+        <div id="executive" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Articles</div>
+                    <div class="stat-value blue" id="statTotal">120</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Competitors Tracked</div>
+                    <div class="stat-value green" id="statCompetitors">20</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Order/Contract News</div>
+                    <div class="stat-value orange" id="statOrders">59</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Financial Updates</div>
+                    <div class="stat-value purple" id="statFinancials">49</div>
+                </div>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">News Volume by Competitor</div>
+                    <canvas id="competitorChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Category Breakdown</div>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Business Unit Distribution</div>
+                    <canvas id="buChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                Key Stories by Category
+            </div>
+            
+            <div id="categorySections"></div>
+        </div>
+        
+        <div id="detailed" class="tab-content">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Business Unit</label>
+                    <select id="filterBU" onchange="filterNews()">
+                        <option value="">All Business Units</option>
+                        <option value="T&D">T&D</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Railways">Railways</option>
+                        <option value="Renewables">Renewables</option>
+                        <option value="Oil & Gas">Oil & Gas</option>
+                        <option value="SAE">SAE</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Competitor</label>
+                    <select id="filterCompetitor" onchange="filterNews()">
+                        <option value="">All Competitors</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select id="filterCategory" onchange="filterNews()">
+                        <option value="">All Categories</option>
+                        <option value="Financials">Financials</option>
+                        <option value="Order Intake">Order Intake</option>
+                        <option value="Project Wins">Project Wins</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="M&A">M&A</option>
+                        <option value="Regulatory">Regulatory</option>
+                        <option value="Operations">Operations</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="all-news-list">
+                <div class="all-news-header">
+                    <span class="section-title">All News Articles</span>
+                    <span class="results-count" id="resultsCount"></span>
+                </div>
+                <div class="news-list" id="allNewsList" style="max-height: none;"></div>
+            </div>
+        </div>
+        
+        <div class="timestamp">
+            Last updated: 12/27/2025, 08:17:33 PM | Data source: Web research aggregation
+        </div>
+    </main>
+    
+    <script>
+        // Initial data
+        const newsData = [{"businessUnit":"General","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"[](/)\n\n* [Visit Corporate Site](/)\n\n[Sign in](https://login.globaldata.com/login/index/gdcom?returnUrl=/company-profile/kec-international-ltd/competitors/)\n\nSearch\n\nMenu\n\n* [Sign In](https://login.globaldata.com/login/index/gdcom?returnUrl=/company-profile/kec-international-ltd/competitors/)\n* [Who ","title":"KEC International Ltd Peers & Key Competitors - GlobalData","url":"https://www.globaldata.com/company-profile/kec-international-ltd/competitors/"},{"businessUnit":"General","category":"Order Intake","competitors":["KEC International","ABB India","Siemens India"],"date":null,"excerpt":"KEC International competitor comparison and performance snapshot within industry ; ABB India Ltd. Market Leader. stock-bull-svg, 5215 ; Siemens Ltd. Market RunnerÂ ...","title":"KEC International - Competitors/Peers Analysis - Trendlyne.com","url":"https://trendlyne.com/fundamentals/peer-group/727/KEC/kec-international-ltd/"},{"businessUnit":"Civil","category":"Financials","competitors":["Kalpataru Projects","HCC","Afcons Infrastructure"],"date":"2025-11-25","excerpt":"Other substantial competitors in the Indian market include Hindustan Construction Company (HCC), Gammon India Limited, Afcons Infrastructure ...","title":"What is Competitive Landscape of Kalpataru Projects International ...","url":"https://pestel-analysis.com/blogs/competitors/kalpataruprojects"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International","Transrail Lighting"],"date":"2025-01-16","excerpt":"[](/)\n\nPremium Subscribers: Complete your KYC to Avoid  \nService Suspension. [Login Here](/subscription/kyc.aspx?hdnTId=0&usertype1=&hdnUTMs=&email=&utm_source=homepage&utm_medium=website&utm_campaign=top-center&utm_content=customer-kyc-signup) .\n[](https://www.equitymaster.com/outlook/asset-allocat","title":"Best Power Transmission Stock: Transrail Lighting vs KEC International","url":"https://www.equitymaster.com/detail.asp?date=01/16/2025&story=3&title=Best-Power-Transmission-Stock-Transrail-Lighting-vs-KEC-International"},{"businessUnit":"General","category":"Project Wins","competitors":["Industry"],"date":"2025-10-14","excerpt":"##### [Login](javascript:void\\(0\\))\n\n[](javascript:void\\(\\))\n\n* [About Us](https://desimachines.com/about-us/)\n* [Excavator](https://desimachines.com/excavator/)\n* [Backhoe Loader](https://desimachines.com/backhoe-loader/)\n* [Motor Grader](https://desimachines.com/motor-grader/)\n* [Wheel Loader](htt","title":"Top 10 EPC Companies in India (2025) | Desi Machines","url":"https://desimachines.com/blog/top-10-epc-companies-in-india/"},{"businessUnit":"General","category":"Operations","competitors":["Industry"],"date":null,"excerpt":"Peer Comparison\n\nInvest wise with Expert advice\n\nGet Started\n\nBy continuing, I accept the [T&C](https://www.indiainfoline.com/iserve-open-demat/terms-conditions.html) and agree to receive communication on Whatsapp\n\n## QUICKLINKS FOR K E C International Ltd\n\n# K E C International Ltd Peer Comparison ","title":"K E C International Ltd Peer Comparison - Competitive Analysis | IIFL Capital","url":"https://www.indiainfoline.com/company/k-e-c-international-ltd/peer-comparison"},{"businessUnit":"T&D","category":"Financials","competitors":["KEC International","Kalpataru Projects"],"date":"2025-06-12","excerpt":"The company is involved in various EPC projects related to infrastructure development, such as buildings, power transmission, roads, water pipelines, railway electrification, and oil and gas pipelines. They offer comprehensive solutions, including design, testing, fabrication, and construction of tr","title":"KEC International Ltd Vs Kalpataru Projects International â Best Infrastructure Stocks","url":"https://aliceblueonline.com/kec-international-ltd-vs-kalpataru-projects-international-best-infrastructure-stocks/"},{"businessUnit":"General","category":"Financials","competitors":["Kalpataru Projects"],"date":null,"excerpt":"Kalpataru Limited Competitors | Companies like Kalpataru Limited\n\n[!\n ... \nLimited Competitors\")\n\n[<img src='https://d1hbpr09pwz0sk.cloudfront.net/logo_url/kalpataru-limited-33145629' alt='Kalpataru Limited' width='75' height='75' />](/kalpataru-limited-competitors_b5f6f9aff42e8edf \"Kalpataru Limite","title":"Kalpataru Limited Competitors | Companies like Kalpataru Limited ","url":"https://rocketreach.co/kalpataru-limited-competitors_b5f6f9aff42e8edf"},{"businessUnit":"General","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"[Financials](/kec-international/financials)\n* [Operating Metrics](/kec-international/operating-metrics)\n* [Human Capital](/kec-international/human-capital)\n* [Key People](/kec-international/executives)\n* [Competitors](/kec-international/competitors)\n* [Supplier Risk](/kec-international/supplier-risk","title":"Top KEC International Competitors and Alternatives | Craft.co","url":"https://craft.co/kec-international/competitors"},{"businessUnit":"Civil","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"We do not share or sell your email address with anyone else. X\n\nFREE TRIAL Back\n\nÃ\n\n### Explore 2,000+ Projects Free\n\nTry Global Project Tracker free. See 2,000+ live projects, test the data, and discover new\nopportunities. \\* Full access includes 70,000+ projects worldwide. ## TRUSTED BY 500+ COMPA","title":"List of Top 15 Construction Companies in India [2025]","url":"https://www.blackridgeresearch.com/blog/list-of-largest-top-construction-epc-companies-contractors-in-india?srsltid=AfmBOopvNWLxRtH1sUUrlkO8sKXJtnYvTunynE0js2yPCEGKJPNCcf5H"},{"businessUnit":"Railways","category":"Financials","competitors":["KEC International","Transrail Lighting"],"date":null,"excerpt":"Transrail Lighting vs. KEC International â A complete breakdown of their business, future prospects, and Q3 FY25 performance.","title":"Transrail Lighting vs KEC International: Business, Prospects, Q3 FY25 | Alpha Tribe posted on the topic","url":"https://www.linkedin.com/posts/alphatribein_transrail-lighting-vs-kec-international-activity-7302290041383399424-KkYY"},{"businessUnit":"Renewables","category":"Financials","competitors":["KEC International","Kalpataru Projects","Techno Electric"],"date":null,"excerpt":"KEC International major competitors are Skipper, Kalpataru Projects, Techno Electric &Eng, Waaree Renewables, KPI Green Energy, Sterling and Wilson, Ujaas ...Read more","title":"KEC International Ltd. Stock price: Live updates","url":"https://www.tijorifinance.com/company/kec-international-limited/"},{"businessUnit":"Railways","category":"Financials","competitors":["Kalpataru Projects","RVNL"],"date":null,"excerpt":"Kalpataru Projects competitor comparison and performance snapshot within industry ; Rail Vikas Nigam Ltd. stock-bull-svg, 345.7 ; NBCC (India) Ltd. stock-bull-svg ...","title":"Kalpataru Projects - Competitors/Peers Analysis - Trendlyne.com","url":"https://trendlyne.com/fundamentals/peer-group/712/KPIL/kalpataru-projects-international-ltd/"},{"businessUnit":"Civil","category":"Order Intake","competitors":["Industry"],"date":"2025-07-22","excerpt":"December 17, 2025\n\n* [About Us](https://www.constructionplacements.com/about-us/)\n* [Privacy](https://www.constructionplacements.com/about-us/privacy-security-policies/)\n* [Terms](https://www.constructionplacements.com/terms-and-conditions/)\n* [Disclaimer](https://www.constructionplacements.com/disc","title":"Top 50 EPC Companies India 2025 | EPC Contractors In India","url":"https://www.constructionplacements.com/top-epc-companies-epc-contractor-in-india/"},{"businessUnit":"General","category":"Financials","competitors":["KEC International","Kalpataru Projects","Sterlite Power","Adani Transmission"],"date":null,"excerpt":"Risk](/kalpataru-projects-international/supplier-risk)\n\n* [Home](https://craft.co)\n* / [Kalpataru Projects International](/kalpataru-projects-international)\n* / Competitors\n\n# [Kalpataru Projects International](/kalpataru-projects-international) Competitors and Similar Companies Clear all\n\nKalpataru","title":"Top Kalpataru Projects International Competitors and Alternatives | Craft.co","url":"https://craft.co/kalpataru-projects-international/competitors"},{"businessUnit":"Civil","category":"Operations","competitors":["KEC International","IRCON International","Afcons Infrastructure"],"date":null,"excerpt":"KEC Similar Stocks ; Ircon International. I. Ircon International. 178.71. Invest. 4.69% ; Afcons Infrastructure. A. Afcons Infrastructure. 389.95. Invest. 0.59%Â ...","title":"KEC International Similar Stocks - Compare with Similar Companies","url":"https://dhan.co/stocks/kec-international-ltd-peer-comparison/"},{"businessUnit":"T&D","category":"Financials","competitors":["KEC International"],"date":"2025-12-12","excerpt":"Related Reports](https://platform.tracxn.com/a/d/company/M-_lOdVz6LMd9xX9EX7nhyRykQiYsmn7qvBzbnRWqH0/kecrpg.com/reports)\n\n[Most viewed in 2019](/d/companies/saas-zszabz-by-jghmuc)\n\n## KEC International - About the company\n\nKEC International is a public company based in Mumbai (India), founded in 194","title":"KEC International - 2025 Company Profile, Team, Competitors & Financials - Tracxn","url":"https://tracxn.com/d/companies/kec-international/__acFkr3blZ_NZ_MKHQG5KKkWp4UIuAU9IhPQtvDG0bQc"},{"businessUnit":"T&D","category":"Order Intake","competitors":["L&T","Sterlite Power"],"date":null,"excerpt":"X\n\nAccess Company Profiles\n\nGet business overview, business operations details specific to this market, products and services, latest developments and more...\n\nBusiness Email\n\nSelect Companies\n\nSelect All\n\nLoading...\n\n# India Power EPC Companies\n\nMI Matrix analyzes the top 10 companies in India Powe","title":"India Power EPC Companies - Top Company List","url":"https://www.mordorintelligence.com/industry-reports/india-power-epc-market/companies"},{"businessUnit":"Civil","category":"Financials","competitors":["Kalpataru Projects","IRCON International","Afcons Infrastructure"],"date":null,"excerpt":"KPIL Similar Stocks ; Ircon International. I. Ircon International. 178.71. Invest. 4.69% ; Afcons Infrastructure. A. Afcons Infrastructure. 389.95. Invest. 0.59% ...","title":"Kalpataru Projects International Similar Stocks - Dhan","url":"https://dhan.co/stocks/kalpataru-power-transmission-ltd-peer-comparison/"},{"businessUnit":"General","category":"Order Intake","competitors":["KEC International"],"date":"2025-11-07","excerpt":"[](https://www.owler.com/corp)\n\nNo tags found\n\nCompanies\n\nNo companies found\n\n[Advanced Search](/search)\n\n[Newsfeed](/feed)\n\n[Alerts](/email-settings)\n\n[Saved Lists](/portfolio)\n\nSign Up for Free Login\n\n[](https://www.owler.com/corp)\n\nGet Updates\n\n**94** Followers on Owler\n\n[Overview](/company/kecrp","title":"KEC Competitors and Alternatives - Owler","url":"https://www.owler.com/company/kecrpg/competitors"},{"businessUnit":"General","category":"Financials","competitors":["Kalpataru Projects"],"date":null,"excerpt":"[](/)\n\n* [Home](/)\n* ABOUT US\n* OUR businesses\n* SUSTAINABILITY\n* CSR\n* INVESTORS\n* NEWS & MEDIA\n* CAREERS\n* [CONTACT US](/contact)\n\n## Financials\n\nQuarterly Result\n\nResults\n\nAnalyst Presentation\n\nConference Call Transcript & Recording\n\nAnnual Reports\n\nAnnual Reports\n\nFinancials of Subsidiaries\n\nAGM","title":"Financials - Kalpataru Projects International Limited","url":"https://kalpataruprojects.com/investors/financials/quarterly-result"},{"businessUnit":"Railways","category":"Order Intake","competitors":["Transrail Lighting"],"date":"2025-03-07","excerpt":"Rajesh Neelakantan (Senior Managerial Personnel) from Chief Operating Officer (Civil Division) of the Company has been re-designated as Chief ...","title":"Transrail Lighting Limited Announces Executive Changes","url":"https://in.marketscreener.com/quote/stock/TRANSRAIL-LIGHTING-LIMITE-180244264/news/Transrail-Lighting-Limited-Announces-Executive-Changes-49268570/"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"[kecindia@kecrpg.com](mailto:kecindia@kecrpg.com)\n\n[\\+91 22 66670200](tel: +91 22 66670200)\n\n* [](https://www.instagram.com/kec.intl/)\n* [](https://www.linkedin.com/company/kec-international-ltd.)\n* [](https://twitter.com/KEC_Intl)\n* [](https://www.facebook.com/KEC-International-Limited-241066525904","title":"KEC International wins New Orders of Rs. 1,174 crores in the T&D business -  KEC International","url":"https://www.kecrpg.com/press-release/orders/kec-international-wins-new-orders-of-rs.-1,174-crores-in-the-t&d-business-13-10-25"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"[kecindia@kecrpg.com](mailto:kecindia@kecrpg.com)\n\n[\\+91 22 66670200](tel: +91 22 66670200)\n\n* [](https://www.instagram.com/kec.intl/)\n* [](https://www.linkedin.com/company/kec-international-ltd.)\n* [](https://twitter.com/KEC_Intl)\n* [](https://www.facebook.com/KEC-International-Limited-241066525904","title":"KEC International wins New Orders of Rs. 1,150 crores -  KEC International","url":"https://www.kecrpg.com/press-release/orders/kec-international-wins-new-orders-of-rs.-1,150-crores-12-dec-2025"},{"businessUnit":"T&D","category":"Order Intake","competitors":["L&T"],"date":null,"excerpt":"# L&T Wins Orders (Large\\*) for Power Transmission & Distribution Business in Saudi Arabia\n\n* 29 October 2025\n* [Download PDF](https://2025prodstorageaccount-eqdyc8g8hpccdfez.a02.azurefd.net/ltprod/media/qeoime2e/2025-10-29-lt-wins-orders-large-for-power-transmission-distribution-business-in-saudi-a","title":"L&T Wins Orders (Large*) for Power Transmission & Distribution Business in Saudi Arabia","url":"https://www.larsentoubro.com/pressreleases/2025-10-29-lt-wins-orders-large-for-power-transmission-distribution-business-in-saudi-arabia"},{"businessUnit":"General","category":"Financials","competitors":["Kalpataru Projects"],"date":null,"excerpt":"[](/)\n\n* [Home](/)\n* ABOUT US\n* OUR businesses\n* SUSTAINABILITY\n* CSR\n* INVESTORS\n* NEWS & MEDIA\n* CAREERS\n* [CONTACT US](/contact)\n\n## Financials\n\nQuarterly Result\n\nResults\n\nAnalyst Presentation\n\nConference Call Transcript & Recording\n\nAnnual Reports\n\nAnnual Reports\n\nFinancials of Subsidiaries\n\nAGM","title":"Annual Reports - Kalpataru Projects International Limited","url":"https://kalpataruprojects.com/investors/financials/annual-reports"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International","Transrail Lighting"],"date":null,"excerpt":"Mr Narang holds a Bachelor's\n\ndegree in Commerce from the University of Delhi and a Postgraduate Diploma in Marketing from the Institute of Marketing Management, New Delhi. He has worked with Bharti\n\nAirtel Limited in his capacity as the Chief Operating Officer (West). He was also associated with CE","title":"[PDF] PRESENTATION CORPORATE - Transrail","url":"https://transrail.in/wp-content/uploads/2025/10/Corporate-Presentation-August-2025-USD-.pdf"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":"2025-12-12","excerpt":"Out\n\nAdvertisement\n\nAdvertisement\n\n# KEC International Secures Rs. 1,150 Crore Orders in India\n\n[TipRanks India Auto-Generated Newsdesk](/news/author/tipranksindianewsdesk)\n\nA+ A-\n\nStory Highlights\n\n* KEC International secured Rs. 1,150 crores in T&D and Civil orders. * Largest-ever T&D order enhanc","title":"KEC International Secures Rs. 1,150 Crore Orders in India - TipRanks.com","url":"https://www.tipranks.com/news/company-announcements/kec-international-secures-rs-1150-crore-orders-in-india"},{"businessUnit":"General","category":"Operations","competitors":["KEC International"],"date":null,"excerpt":"[kecindia@kecrpg.com](mailto:kecindia@kecrpg.com)\n\n[\\+91 22 66670200](tel: +91 22 66670200)\n\n* [](https://www.instagram.com/kec.intl/)\n* [](https://www.linkedin.com/company/kec-international-ltd.)\n* [](https://twitter.com/KEC_Intl)\n* [](https://www.facebook.com/KEC-International-Limited-241066525904","title":"Press Release -  KEC International","url":"https://www.kecrpg.com/press-release"},{"businessUnit":"T&D","category":"Financials","competitors":["L&T"],"date":null,"excerpt":"# L&T Wins Grid Infrastructure Orders (Large\\*) for its Power Transmission & Distribution business\n\n* 13 October 2025\n* [Download PDF](https://2025prodstorageaccount-eqdyc8g8hpccdfez.a02.azurefd.net/ltprod/media/1q1lt1c1/2025-10-13-lt-wins-grid-infrastructure-orders-large-for-its-power-transmission-","title":"L&T Wins Grid Infrastructure Orders (Large*) for its Power Transmission & Distribution business","url":"https://www.larsentoubro.com/pressreleases/2025-10-13-lt-wins-grid-infrastructure-orders-large-for-its-power-transmission-distribution-business"},{"businessUnit":"Civil","category":"Financials","competitors":["Kalpataru Projects"],"date":null,"excerpt":"Okay\n\nKalpataru Projects International Ltd. 31 Oct 2025 14:52 PM\n\n1169\\.2\n\n\\-1.4%\n\n[Result PDF](https://www.bseindia.com/xml-data/corpfiling/AttachHis/021c7c47-f248-4a6d-9df0-201b7043f4d0.pdf)\n\n## Q2FY26 Quarterly Result Announced for Kalpataru Projects International Ltd.\n\n### **Construction & Engin","title":"KALPATARU PROJECTS INTERNATIONAL LTD. : Latest Quarterly Results Analysis - ICICI Direct","url":"https://www.icicidirect.com/research/equity/rapid-results/kalpataru-projects-international-ltd"},{"businessUnit":"Railways","category":"Order Intake","competitors":["Transrail Lighting","Power Grid Corporation"],"date":"2025-11-11","excerpt":"17,799** **crores** as on 30 <sup>th</sup> September 2025\n\n**Domestic -**\n\n**International -**\n\n**39%**\n\n**61%**\n\n**Domestic -**\n\n**International -**\n\n14\n\n**Business Highlights**\n\n15\n\nâ¢\n\nAwarded â **Most Admired Emerging company in Power Sector** â by ET Now Infra Focus awards. â¢\n\n**âCertificate** *","title":"[PDF] TRANSRAIL LIGHTING LIMITED - image","url":"https://bsmedia.business-standard.com/_media/bs/data/announcements/bse/11112025/6c7e4e0b-b8f1-43ed-8649-0f0d668bc22f.pdf"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"Businesses](/emerging-businesses)\n    + [Oil & Gas Pipelines](/oil-&-gas-pipelines)\n    + [Cables](/asiancables)\n* Expertise\n  \n    + [Turnkey EPC Solutions](/turnkey-epc-solutions)\n    + [Engineering & Design](/engineering-&-design)\n    + [Manufacturing](/manufacturing)\n    + [Tower Testing](/tower","title":"KEC wins a New Order of Rs. 1,064 crore in the International T&D business -  KEC International","url":"https://www.kecrpg.com/press-release/orders/kec-wins-a-new-order-of-rs.-1,064-crore-in-the-international-t&d-business-14-10-25"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"Dec 13, 2025 Â· (13 Dec 2025, 11:18). KEC International wins new orders of Rs 1,150 cr. KEC International has secured new orders of Rs. 1,150 crore in the T&DÂ ...","title":"KEC International wins new orders of Rs 1,150 cr | Capital Market News","url":"https://www.capitalmarket.com/markets/news/corporate-news/kec-international-wins-new-orders-of-rs-1-150-cr/1660510"},{"businessUnit":"T&D","category":"Order Intake","competitors":["L&T"],"date":"2025-10-29","excerpt":"[Subscribe Now](https://www.saudigulfprojects.com/monthly-reports-nov-2025/)\n\nDecember 10, 2025\n\n* [LinkedIn](https://www.linkedin.com/company/saudigulfprojects)\n* [Facebook](https://www.facebook.com/SaudiGulfProjects)\n* [Twitter](https://twitter.com/SaudigulfProjec)\n* [Instagram](https://www.instag","title":"L&T awarded 380kV Substation and OHTL Contracts in Saudi Arabia - SaudiGulf Projects","url":"https://www.saudigulfprojects.com/2025/10/lt-awarded-380kv-substation-and-ohtl-contracts-in-saudi-arabia/"},{"businessUnit":"General","category":"Financials","competitors":["Kalpataru Projects"],"date":null,"excerpt":"Summary]() [Chart]() [Analysis]() [Peers]() [Quarters]() [Profit & Loss]() [Balance Sheet]() [Cash Flow]() [Ratios]() [Investors]() [Documents]()\n\nNotebook AI\n\n# Kalpataru Projects International Ltd\n\nâ¹ 1,169 \\-1.40%\n\n04 Dec\n\\- close price\n\nExport to Excel\n\nFollow\n\n[kalpatarupower.com](http://www.kal","title":"Kalpataru Projects International Ltd share price | About Kalpataru Proj. | Key Insights - Screener","url":"https://www.screener.in/company/KPIL/consolidated/"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Transrail Lighting"],"date":"2025-12-08","excerpt":"Transrail Lighting Ltd. announced fresh orders worth â¹822 crore, including a major 400 kV transmission line EPC contract in the GCC region.","title":"Transrail Lighting Bags â¹822 Crore Orders, Igniting Growth Hopes!","url":"https://www.whalesbook.com/news/English/consumer-products/IndiGo-CEO-Under-Fire-DGCA-Issues-Shock-Show-Cause-Notice-Over-Record-1000-Flight-Cancellations/6936fc8cf7a32150d0c521cf"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"KEC International Wins â¹1,402 Crore Orders Across T&D, Civil, and Cables Segments\n\nInvest wise with Expert advice\n\nGet Started\n\nBy continuing, I accept the [T&C](https://www.indiainfoline.com/iserve-open-demat/terms-conditions.html) and agree to receive communication on Whatsapp\n\n[<img src='/_next/i","title":"KEC International Wins â¹1,402 Crore Orders Across T&D, Civil, and Cables Segments | India Infoline","url":"https://www.indiainfoline.com/news/business/kec-international-wins-1402-crore-orders-across-td-civil-and-cables-segments"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"KEC International Ltd. said it had bagged new orders aggregating to Rs.612 crore in its Transmission, Power Systems, Cables and Water Businesses.","title":"KEC International Wins Orders Worth Rs. 612 Crore","url":"https://www.rttnews.com/2020312/kec-international-wins-orders-worth-rs-612-crore.aspx"},{"businessUnit":"T&D","category":"Order Intake","competitors":["L&T"],"date":"2025-10-29","excerpt":"[](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.angelone.in%2Fnews%2Fmarket-updates%2Flarsen-toubro-secures-large-orders-for-power-transmission-and-distribution-in-saudi-arabia) [](mailto:?subject= Larsen & Toubro Secures Large Orders for Power Transmission and Distribution in Saud","title":"Larsen & Toubro Secures Large Orders for Power Transmission and Distribution in Saudi Arabia","url":"https://www.angelone.in/news/market-updates/larsen-toubro-secures-large-orders-for-power-transmission-and-distribution-in-saudi-arabia"},{"businessUnit":"Civil","category":"Order Intake","competitors":["IRCON International"],"date":"2025-10-18","excerpt":"Petronet LNG has awarded the work to Ircon International for civil, structural & UG works including piling â PART-A.","title":"Ircon International wins work order of Rs 360 cr | Capital Market News","url":"https://www.capitalmarket.com/markets/news/live-news/ircon-international-wins-work-order-of-rs-360-cr/1643860"},{"businessUnit":"General","category":"Financials","competitors":["RVNL"],"date":null,"excerpt":"12 hours ago Â· Kaynes Technology shares slid 44% in 2025 after a 174% gain in 2024. The stock faced investor concerns around financial transparency and relatedÂ ...","title":"Trent, RVNL among 10 former multibaggers that crashed in 2025 ...","url":"https://m.economictimes.com/markets/stocks/news/trent-rvnl-among-10-former-multibaggers-that-crashed-in-2025-after-spectacular-2024-rally/former-multibaggers-turn-sour-in-2025/slideshow/126202149.cms"},{"businessUnit":"Renewables","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"* [Overview](about-us)\n* [Statistics](about-us/statistics)\n* [Awards & Recognitions](about-us/awards-and-recognitions)\n* [Leadership](about-us/leadership)\n* [Our Journey](about-us/our-journey)\n\n* Awards & Recognitions\n* \n\n\n* [Overview](about-us)\n* [Statistics](about-us/statistics)\n* [Leadership](abo","title":"Award and Recognitions - Sterling and Wilson Renewable Energy Limited","url":"https://www.sterlingandwilsonre.com/about-us/awards-and-recognitions"},{"businessUnit":"General","category":"Order Intake","competitors":["IRCON International"],"date":"2025-10-20","excerpt":"[English](https://www.moneycontrol.com/ \"English\")\n\n* [Hindi](https://hindi.moneycontrol.com \"Hindi\")\n* [Gujarati](https://gujarati.moneycontrol.com/ \"Gujarati\")\n\n[Specials](javascript:; \"Specials\")\n\n[](https://www.moneycontrolpay.com/ \"Loans up to â¹50 Lakhs\")\n\nSearch Quotes, News, Mutual Fund NAVs\n","title":"Ircon International shares gains on order win from Petronet ...","url":"https://www.moneycontrol.com/news/business/stocks/ircon-international-shares-in-focus-on-order-win-worth-rs-360-crore-from-petronet-lng-13623568.html"},{"businessUnit":"General","category":"Order Intake","competitors":["NCC Limited"],"date":null,"excerpt":"Re f. No . : NCCL/UAFR/June-2025-26/Reg 30&33\n\nDate\n\n: 05 th August 2025\n\n**National Stock Exchange** **of** **India Ltd**\n\nExchange Plaza, C-1, Block G\n\nBandra - Kurla Complex\n\nBandra (E)\n\nMumbai - 400 051. **Symbol: NCC**\n\n**Dear Sir,**\n\n**BSE Limited**\n\nPhiroze Jeejeebhoy Towers\n\nDalal Street,\n\nF","title":"Ref. No.: NCCL/UAFR/June-2025-26/Reg 30&33 Date","url":"https://www.ncclimited.com/announcements-disclosures/2025/Results_050825.pdf"},{"businessUnit":"General","category":"Financials","competitors":["Industry"],"date":null,"excerpt":"[](index.aspx)\n\n* [ABOUT US](Aboutus.aspx)\n* [PRODUCTS & SERVICES](Products-Services.aspx)\n* [BACK OFFICE](https://backoffice.smartequity.in:1467/capexweb/capexweb/)\n* [DOWNLOAD](Download.aspx)\n* [CONTACT US](Contactus.aspx)\n\n[Previous]() [Next]()\n\n##### Attention Investors\n\n1\\. Stock Brokers can ac","title":"\n\tSmartequity\n","url":"https://www.smartequity.in/"},{"businessUnit":"Railways","category":"Project Wins","competitors":["RVNL"],"date":null,"excerpt":"# Rail Vikas Nigam Ltd\n\nNotebook AI\n\n# Rail Vikas Nigam Ltd\n\nâ¹ 319 4\\.31%\n\n19 Dec\n\\- close price\n\nExport to Excel\n\nFollow\n\n[rvnl.org](http://www.rvnl.org) [BSE: 542649](https://www.bseindia.com/stock-share-price/rail-vikas-nigam-ltd/RVNL/542649/) [NSE: RVNL](https://www.nseindia.com/get-quotes/equit","title":"Rail Vikas Nigam Ltd share price | About Rail Vikas | Key Insights - Screener","url":"https://www.screener.in/company/RVNL/consolidated/"},{"businessUnit":"Renewables","category":"Financials","competitors":["Sterling Wilson"],"date":"2025-11-27","excerpt":"Credit: Canva\n\nSterling and Wilson Renewable Energy Limited (SWREL), a leading domestic renewable EPC is proud to announce that it has won its second international project from South Africa this fiscal. The company has been awarded a turnkey EPC contract for a 240 MW AC Solar PV project in South Afr","title":"Sterling & Wilson RE Bags Major 240 MW Solar Project, Strengthens Presence in South Africa - SolarQuarter","url":"https://solarquarter.com/2025/11/27/sterling-wilson-re-bags-major-240-mw-solar-project-strengthens-presence-in-south-africa/"},{"businessUnit":"Railways","category":"Order Intake","competitors":["IRCON International"],"date":null,"excerpt":"IRCON International share price gains 4% on â¹127 crore order win from North Western Railways\n    * Stock Market Today: IRCON International share price gained more than 4% in morning trade on Tuesday. The company announced that it had won\nâ¹ 127 crore order from North Western Railways\n\nUjjval Jauhari\n","title":"IRCON International share price gains 4% on  â¹127 crore order win from North Western Railways | Stock Market News","url":"https://www.livemint.com/market/stock-market-news/ircon-international-share-price-gains-4-on-rs-127-crore-order-win-from-north-western-railway-11744690495183.html"},{"businessUnit":"General","category":"Operations","competitors":["NCC Limited"],"date":"2025-11-11","excerpt":"[Skip to content]()\n\n# What is Growth Strategy and Future Prospects of NCC Company? ### NCC Bundle\n\nGet Full Bundle:\n\n| |[5 FORCES](/products/ncclimited-five-forces-analysis) | |$10 |\n| --- | --- | --- | --- |\n| |[BCG](/products/ncclimited-bcg-matrix) | |$10 |\n| |[CANVAS](/products/ncclimited-busine","title":"What is Growth Strategy and Future Prospects of NCC Company? â Pestel-analysis.com","url":"https://pestel-analysis.com/blogs/growth-strategy/ncclimited"},{"businessUnit":"Civil","category":"Order Intake","competitors":["IRCON International"],"date":null,"excerpt":"Veerhealth Care Ltd : The Company has received order from a Company having top position in personal care segment on marketplace companies in the country for the production of its private-label personal care range of products. ###### [IRCON International Ltd : Petronet LNG Limited, has awarded the wo","title":"Nifty: 25763 (41) - Satyambee","url":"https://satyambee.com/news_bit_room.php?bit_id=893"},{"businessUnit":"General","category":"Financials","competitors":["RVNL"],"date":null,"excerpt":"* [English](#)\n  \n    + Hindi\n    + English\n*\n\n* Login\n\n**Investors**\n\n1. [Home](#)\n2. Investors\n\n#### Key figures for FY 2024-2025 (In INR)\n\n#### Latest Results\n\n  \n#### Important Notice & Announcements\n\n[Read more news]()\n\n#### Important Notice & Announcements\n\n[Financial Results]() [Shareholding ","title":"https://rvnl.org/investor","url":"https://rvnl.org/investor"},{"businessUnit":"Renewables","category":"Order Intake","competitors":["Industry"],"date":"2024-12-23","excerpt":"[Magazine](#)\n  \n    + [2025](https://www.pv-magazine.com/issue/2025/)\n    + [2024](https://www.pv-magazine.com/issue/2024/)\n    + [Issues before 2024](https://www.pv-magazine.com/issue/archive/)\n    + [Special Editions](https://www.pv-magazine.com/special-editions/)\n* [About](#)\n  \n    + [About us]","title":"Sterling and Wilson wins $141 million deal for 500 MW solar project in India â pv magazine International","url":"https://www.pv-magazine.com/2024/12/23/sterling-and-wilson-wins-141-million-epc-deal-for-500-mw-solar-project-in-india/"},{"businessUnit":"General","category":"Financials","competitors":["IRCON International"],"date":null,"excerpt":"16 Apr 2025 â IRCON reported a 64.81% drop in consolidated net profit for the quarter ending December 2024 , with figures falling to â¹86.10 crore. Revenue fromÂ ... Read more","title":"IRCON Share Surges on Winning â¹127.8 Crore Order ...","url":"https://www.angelone.in/news/share-market/ircon-share-surges-winning-rs-127-crore-order-from-north-western-railway"},{"businessUnit":"Civil","category":"Project Wins","competitors":["NCC Limited"],"date":null,"excerpt":"2025-05-15 Â· NCC's modernization project completed â Avicii Arena now opens. At the beginning of 2024, NCC and the property owner SGA Fastigheter (Stockholm ...Read more","title":"Building, Industry, Infrastructure, Property Development  | NCC","url":"https://www.ncc.com/"},{"businessUnit":"Renewables","category":"Order Intake","competitors":["IRCON International"],"date":null,"excerpt":"International Conveyors Gains on Stake Acquisition in Sterling and Wilson Renewable Energy ... Ircon International Gains on BSE; Bags RS 510.47 Crore Project ...","title":"MSB e_Trade Securities Ltd.","url":"https://admin.msbetrade.com/"},{"businessUnit":"Railways","category":"Financials","competitors":["RVNL"],"date":null,"excerpt":"... 2025 Net Sales at Rs 6,345.11 crore, down 5.31% Y-o-Y Â· Rail Vikas Consolidated December 2024 Net Sales at Rs 4,567.38 crore, down 2.6% Y-o-Y Â· RVNL shares dropÂ ...","title":"Quarterly Results, Rail Vikas Nigam Financial Statement & Accounts","url":"https://www.moneycontrol.com/markets/financials/quarterly-results/railvikasnigam-RVN"},{"businessUnit":"Renewables","category":"Order Intake","competitors":["Sterling Wilson"],"date":null,"excerpt":"**For Immediate Release**\n\n1\n\n**SWREL achieves a breakthrough in Wind EPC; Announces 3 New Solar/Hybrid Projects**\n\n**Total Orders Valued at ~ INR 1,470 crore**\n\n_Key Highlights_\n\n_~ Received our first Wind EPC order through a hybrid project in Rajasthan where the company will be_\n\n_executing BoP/Bo","title":"[PDF] SWREL achieves a breakthrough in Wind EPC - Sterling and Wilson","url":"https://sterlingandwilson.com/pdf/press/2025-26/Press_Release-SWREL-Announces-Domestic-Order-Wins.pdf"},{"businessUnit":"General","category":"Order Intake","competitors":["IRCON International"],"date":null,"excerpt":"6 May 2025 â IRCON International's shares price rose nearly 2% in early trade on May 6, 2025 , following a major order win. At 09:21 AM, the stock wasÂ ... Read more","title":"IRCON International Shares Price Rises After â¹187 Crore ...","url":"https://www.samco.in/knowledge-center/articles/ircon-international-shares-price-rises-after-%E2%82%B9187-crore-kerala-order-win/"},{"businessUnit":"General","category":"Order Intake","competitors":["NCC Limited"],"date":null,"excerpt":"4 days ago â NCC Limited appointed Sri Sumit Banerjee as Additional Non-Executive Independent Director for five years from Jan 1, 2026. Shareholder approval ...Read more","title":"NCC Ltd","url":"https://www.whalesbook.com/company/NCC"},{"businessUnit":"General","category":"Financials","competitors":["Power Grid Corporation"],"date":null,"excerpt":"Financial Year. 2024-25 ; Annual & Quarterly Results. Annual Results ; Annual Results Upload. BSENSEOutcomedt19052025.PDF (5.41 MB) ; Weight. 18 ; Annual image.","title":"Annual Financial Results 2024-25 | POWERGRID","url":"https://www.powergrid.in/en/annual-financial-results-2024-25"},{"businessUnit":"T&D","category":"Financials","competitors":["KEC International","ABB India","Siemens India"],"date":"2025-11-01","excerpt":"[](/)\n\nPremium Subscribers: Complete your KYC to Avoid  \nService Suspension. [Login Here](/subscription/kyc.aspx?hdnTId=0&usertype1=&hdnUTMs=&email=&utm_source=homepage&utm_medium=website&utm_campaign=top-center&utm_content=customer-kyc-signup) .\n ... \nBy submitting your email address, you also sign","title":"Everyone Knows About Siemens, KEC and ABB India. But here are 5 Power Transmission Stocks Flying Under the Radar","url":"https://www.equitymaster.com/detail.asp?date=11/01/2025&story=1&title=Everyone-Knows-About-Siemens-KEC-and-ABB-India-But-here-are-5-Power-Transmission-Stocks-Flying-Under-the-Radar"},{"businessUnit":"General","category":"Financials","competitors":["ABB India"],"date":"2025-11-06","excerpt":"* Motors and Generators\n  \n  ABB's Motors and Generators Products play a crucial role in providing power and motion for a wide range of automation applications, enhancing industrial productivity and energy efficiency. Overall, ABB's Motors and Generators Products aim to deliver high performance and ","title":"\n\tGrowth in base orders and revenue underscore stable business execution | News center | ABB\n","url":"https://new.abb.com/news/detail/130814/growth-in-base-orders-and-revenue-underscore-stable-business-execution"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"The project SPV was formally transferred to AESL on March 20, 2025. This is AESL's 6th order win this fiscal year, taking its orderbook to ~Rs 57,561 Cr.","title":"AESL Wins ~Rs. 2,800 Cr Transmission Project in Gujarat for Green Hydrogen/Ammonia Manufacturing","url":"https://www.adani.com/newsroom/media-releases/aesl-wins-rs-2800-cr-transmission-project-in-gujarat-for-green-hydrogen-ammonia-manufacturing"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Sterlite Power"],"date":null,"excerpt":"[](#) Search for: Search Button\n\n[](https://www.sterliteelectric.com/news)\n\n## [Sterlite Power commissions its sixth power transmission project in Brazil](https://www.sterliteelectric.com/press-release/sterlite-power-commissions-its-sixth-power-transmission-project-in-brazil)\n\n* [July 20, 2023](http","title":"Sterlite Power commissions its sixth power transmission project in Brazil","url":"https://www.sterliteelectric.com/press-release/sterlite-power-commissions-its-sixth-power-transmission-project-in-brazil"},{"businessUnit":"T&D","category":"Financials","competitors":["Power Grid Corporation"],"date":null,"excerpt":"Power Grid reported consolidated PAT of â¹3,793 Cr in Q2 FY24, up marginally YoY, with H1 PAT at â¹7,517 Cr. Transmission availability remained high at 99.80%Â ...","title":"POWER GRID CORP. LTD. (POWERGRID.NS) Q2 24/25 earnings ...","url":"https://finance.yahoo.com/quote/POWERGRID.NS/earnings/POWERGRID.NS-Q2-2025-earnings_call-216725.html"},{"businessUnit":"General","category":"M&A","competitors":["ABB India"],"date":"2024-12-20","excerpt":"\"Innovative Technologies at Dusseldorf Make Wire 2024 Historic\")\n        \n        ### [Innovative Technologies at Dusseldorf Make Wire 2024 Historic](https://www.wirecable.in/innovative-technologies-at-dusseldorf-make-wire-2024-historic/)\n        \n        May 27, 2024\n        \n        [](#) [](#)\n* ","title":"ABB to Acquire Power Electronics Business of Gamesa Electric - Wire & Cable India","url":"https://www.wirecable.in/abb-to-acquire-power-electronics-business/"},{"businessUnit":"General","category":"Financials","competitors":["ABB India"],"date":"2025-10-16","excerpt":"* Load Management\n  \n  The control of electrical loads is an essential facet in the efficient management of energy. From lighting a lamp to the most advanced industrial operations, precise load management plays a fundamental role for the operation of companies and the efficient and safe use of elect","title":"\n\tQ3 2025 results | News center | ABB\n","url":"https://new.abb.com/news/detail/130000/q3-2025-results"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"Mar 24, 2025 Â· This is AESL's sixth order win during the fiscal year 2025, expanding its order book to Rs575.61bn. It follows a share purchase agreementÂ ...","title":"Adani Energy secures $324.3m transmission project in Gujarat, India","url":"https://www.power-technology.com/news/adani-energy-mundra-gujerat/"},{"businessUnit":"T&D","category":"Project Wins","competitors":["Sterlite Power"],"date":null,"excerpt":"The company's investment in Brazilian transmission sector crosses USD 2bn Â· Project includes 6 substations; 1.544 MVA.","title":"Sterlite Power wins prestigious transmission project in Brazil","url":"https://www.sterliteelectric.com/press-release/sterlite-power-wins-prestigious-transmission-project-brazil"},{"businessUnit":"General","category":"Financials","competitors":["Power Grid Corporation"],"date":null,"excerpt":"[Manufacturing Unit Approval Portal](https://apps.powergrid.in/quality-vendor-approval/v/login.aspx \" Manufacturing Unit Approval Portal\")\n* [Vigilance]()\n  \n    + [Vigilance Overview](/en/vigilance-overview)\n    + [Lodge a complaint to CVO](https://tejas.powergrid.in/vigilance-complaints/)\n    + [C","title":"Annual Results | POWERGRID","url":"https://www.powergrid.in/en/annual-results"},{"businessUnit":"T&D","category":"Operations","competitors":["Industry"],"date":"2025-01-08","excerpt":"[](https://reddit.com/submit?url=https%3A%2F%2Fwww.tndindia.com%2Fshort-stories-2024%2F&title=Short%20Stories%3A%202024 \"Reddit\") [](https://mix.com/mixit?url=https%3A%2F%2Fwww.tndindia.com%2Fshort-stories-2024%2F \"Mix\") [](https://api.whatsapp.com/send?text=Short%20Stories%3A%202024 https%3A%2F%2Fw","title":"Short Stories: 2024 - Your Gateway to Power Transmission & Distribution","url":"https://www.tndindia.com/short-stories-2024/"},{"businessUnit":"SAE","category":"Order Intake","competitors":["ABB India"],"date":null,"excerpt":"### Select region & language\n\n1. Europe\n2. Americas\n3. Middle East & Africa\n4.\n ... \n2024/2025\n\n```\nABB completes 2024 share buyback program\n```\n\nABB has completed its share buyback program that was launched in April 2024. Through this buyback program, ABB repurchased a total of 16,715,684 shares â ","title":"Share buyback program 2024/2025 â ABB Group","url":"https://global.abb/group/en/investors/investor-and-shareholder-resources/share-buybacks/2024"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"* [Home](/Home)\n* [about-us](/Home/about-us)\n* [timeline](/Home/about-us/timeline)\n\n## Timeline\n\n* Adani Energy Solutions raised Rs 8,773 crore to fund the transmission and smart metering opportunity.\nIt is the largest fundraise in the Indian power sector through a QIP\n  \n  In line with the ESG comm","title":"timeline - Adani Energy Solutions","url":"https://www.adanienergysolutions.com/about-us/timeline"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Sterlite Power"],"date":null,"excerpt":"Recording](https://transformers-magazine.com/tm-event/conference-2025/) [IN 2025 - Sustainable Development Strategies for T&D](https://conference.transformers-magazine.com/dubai-2025/) [TMIN 2024: Investments, AI and Sustainability â Recording](https://transformers-magazine.com/tm-event/conference-2","title":"Sterlite Power - Transformers Magazine","url":"https://transformers-magazine.com/tag/sterlite-power/"},{"businessUnit":"General","category":"Financials","competitors":["Power Grid Corporation"],"date":null,"excerpt":"[Calculate potential returns using SIP Calculator](/calculators/sip-calculator/)\n\n[Calculate potential returns using SIP Calculator](/calculators/sip-calculator/)\n\n[](/)\n\nâ\n\nâ\n\n[Login](https://login.dhan.co/?location=DH_WEB) [Open Account](https://login.dhan.co/?location=DH_WEB&refer=DHAN_WEBSITE)\n\n","title":"Power Grid Corporation of India Financials - Balance Sheet, Income Statment, Cash Flow | Dhan","url":"https://dhan.co/stocks/power-grid-corporation-of-india-ltd-financial-results/"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International","Power Grid Corporation","Siemens India","GE Vernova"],"date":"2024-12-14","excerpt":"While it is old news that the Central Electricity Authority has estimated investments around â¹9.1-lakh crore in transmission and distribution (T&D) during FY22-32, with sustained and regular tendering in renewable energy projects, power infrastructure is the need of the hour as the steep power capac","title":"\n\tPower Grid Corp, KEC International, Hitachi Energy, Siemens, GE Vernova T&D, Transformers and Rectifiers et al: Factors Turbocharging the Transmission and Distribution Space - The Hindu BusinessLine\n","url":"https://www.thehindubusinessline.com/portfolio/power-grid-corp-kec-international-hitachi-energy-siemens-ge-vernova-td-transformers-and-rectifiers-et-al-factors-turbocharging-the-transmission-and-distribution-space/article68981900.ece"},{"businessUnit":"General","category":"Order Intake","competitors":["ABB India"],"date":"2025-12-03","excerpt":"[](/ \"ABB logo\")\n\n[0](#) [](https://myportal.abb.com/welcome)\n\n* Products & Solutions\n* Industries\n* Services\n* [Career](https://careers.abb/india/en/home)\n* [About ABB](https://new.abb.com/indian-subcontinent/about)\n* [Contact us](https://new.abb.com/indian-subcontinent/about/contactcenter)\n\nSugges","title":"\n\tCorporate Governance for ABB India Limited | Investors\n","url":"https://new.abb.com/indian-subcontinent/investors/corporate-governance-2025"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"Mar 22, 2025 Â· The project SPV was formally transferred to AESL on March 20, 2025, it added. This is Adani Energy Solutions' 6th order win this fiscal year,Â ...","title":"Adani Energy Solutions wins â¹2800 crore transmission project in Gujarat","url":"https://www.eqmagpro.com/adani-energy-solutions-wins-%E2%82%B92800-crore-transmission-project-in-gujarat-stock-jumps-over-3-eq/"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Sterlite Power"],"date":null,"excerpt":"This project involves 765 KV lines and GIS substations and will be completed within an aggressive timeframe of 18 months, first of its kind in the country, andÂ ...","title":"Sterlite Power Wins 2 Transmission Projects Worth INR 3000 Crore","url":"https://www.wirecable.in/sterlite-power-wins-two-transmission-projects-worth-over-inr-3000-crore/"},{"businessUnit":"General","category":"Financials","competitors":["Tata Projects"],"date":"2025-11-14","excerpt":"Search\n\nAdvertisement\n\n* [Home](https://www.businesstoday.in \"Home\")\n* [Market](https://www.businesstoday.in/markets \"Market\")\n* [BT TV](https://www.businesstoday.in/bt-tv \"BT TV\")\n* [Reels](https://www.businesstoday.in/short-videos \"Reels\")\n* Menu\n\n[Business News](https://www.businesstoday.in/ \"Bus","title":"'Our new portfolio is profitable': Tata Projects CEO Vinayak Pai - BusinessToday","url":"https://www.businesstoday.in/latest/corporate/story/our-new-portfolio-is-profitable-tata-projects-ceo-vinayak-pai-502156-2025-11-14"},{"businessUnit":"Oil & Gas","category":"Order Intake","competitors":["Megha Engineering"],"date":null,"excerpt":"The value of the contract is KWD 69.23 million. The Project aims to to remove hydrogen sulfide (H2S) and carbon dioxide (CO2) from natural gas, producing aÂ ...","title":"Megha Engineering awarded $225.5 million KOC Project","url":"https://www.saudigulfprojects.com/2025/10/megha-engineering-awarded-225-5-million-koc-project/"},{"businessUnit":"T&D","category":"Operations","competitors":["Techno Electric"],"date":null,"excerpt":"Techno Electric & Engineering Company Limited\n\nAnnual Report 2024-25\n\n**Powering the**\n\n**New Dimension**\n\nConverging Power\n\nand Digital Infrastructure\n\n**Powering the**\n\n**New Dimension**\n\nThis shift is fuelling demand for robust power\n\nsystems and advanced digital infrastructure. The power sector ","title":"Powering the New Dimension","url":"https://www.techno.co.in/public/uploads/2/2025-09/annual_report_2024_25.pdf"},{"businessUnit":"General","category":"Financials","competitors":["Tata Projects"],"date":"2025-11-13","excerpt":"##### All Sections\n\n* [Home](/)\n* [India](/india)\n* [World](/world)\n* [Business](/business)\n* [Sports](/sports)\n* [Entertainment](/entertainment)\n* [Opinion](/opinion)\n* [Law](/law)\n* [Lifestyle](/lifestyle)\n* [Dainik Statesman](https://www.dainikstatesmannews.com/)\n* More\n  \n    + [Technology](/tec","title":"Tata Projects reports Rs 8,000-crore revenue in H1 FY25; Eyes major infra push - The Statesman","url":"https://www.thestatesman.com/business/tata-projects-reports-rs-8000-crore-revenue-in-h1-fy25-eyes-major-infra-push-1503511548.html"},{"businessUnit":"Civil","category":"Financials","competitors":["Megha Engineering"],"date":"2025-04-24","excerpt":"[HOME](/) / [NEW NUCLEAR](/new-nuclear)\n\n# EPC contract awarded for Indian reactors\n\nNuclear Power Corporation of India Ltd has presented a purchase order for the contract to build Kaiga units 5 and 6 to Megha Engineering & Infrastructure Ltd in the first major nuclear contract for the Hyderabad-bas","title":"EPC contract awarded for Indian reactors - World Nuclear News","url":"https://www.world-nuclear-news.org/articles/epc-contract-awarded-for-indian-reactors"},{"businessUnit":"General","category":"Financials","competitors":["Techno Electric"],"date":null,"excerpt":"Nov 21, 2025 â Techno Electric is optimistic about future growth, with several bids underway expected to secure approximately â¹1,500 crore in additional orders ...Read more","title":"Techno Electric Rockets: Massive Revenue Surge & Data ...","url":"https://www.whalesbook.com/news/English/industrial-goodsservices/%E0%B0%9F%E0%B1%86%E0%B0%95%E0%B1%8D%E0%B0%A8%E0%B1%8B-%E0%B0%8E%E0%B0%B2%E0%B0%95%E0%B1%8D%E0%B0%9F%E0%B1%8D%E0%B0%B0%E0%B0%BF%E0%B0%95%E0%B1%8D-%E0%B0%B0%E0%B0%BE%E0%B0%95%E0%B1%86%E0%B0%9F%E0%B1%8D%E0%B0%B8%E0%B1%8D-%E0%B0%AD%E0%B0%BE%E0%B0%B0%E0%B1%80-%E0%B0%B0%E0%B1%86%E0%B0%B5%E0%B1%86%E0%B0%A8%E0%B1%8D%E0%B0%AF%E0%B1%82-%E0%B0%AA%E0%B1%86%E0%B0%B0%E0%B1%81%E0%B0%97%E0%B1%81%E0%B0%A6%E0%B0%B2-and-%E0%B0%A1%E0%B1%87%E0%B0%9F%E0%B0%BE-%E0%B0%B8%E0%B1%86%E0%B0%82%E0%B0%9F%E0%B0%B0%E0%B1%8D-%E0%B0%AC%E0%B1%82%E0%B0%AE%E0%B1%8D-%E0%B0%AA%E0%B1%86%E0%B0%9F%E0%B1%8D%E0%B0%9F%E0%B1%81%E0%B0%AC%E0%B0%A1%E0%B0%BF%E0%B0%A6%E0%B0%BE%E0%B0%B0%E0%B1%81%E0%B0%B2%E0%B0%B2%E0%B1%8B-%E0%B0%89%E0%B0%A4%E0%B1%8D%E0%B0%B8%E0%B0%BE%E0%B0%B9%E0%B0%BE%E0%B0%A8%E0%B1%8D%E0%B0%A8%E0%B0%BF-%E0%B0%B0%E0%B1%87%E0%B0%95%E0%B1%86%E0%B0%A4%E0%B1%8D%E0%B0%A4%E0%B0%BF%E0%B0%82%E0%B0%9A%E0%B0%BE%E0%B0%AF%E0%B0%BF/69207e66a71c48bf4cfd9769"},{"businessUnit":"General","category":"Order Intake","competitors":["Tata Projects"],"date":"2025-07-08","excerpt":"Tuesday, December 02, 2025 | 10:03 AM IST [à¤¹à¤¿à¤à¤¦à¥ à¤®à¥à¤ à¤ªà¤¢à¥à¤](https://hindi.business-standard.com/)\n\n[](https://www.business-standard.com)\n\n[](#)\n\n[Home](/) / [Companies](/companies) / [News](/companies/news) / Tata Projects eyes order book of over Rs 60,000 cr from infra biz by 2030\n\n# Tata Projects e","title":"Tata Projects eyes order book of over Rs 60,000 cr from infra biz by 2030 | Company News - Business Standard","url":"https://www.business-standard.com/companies/news/tata-projects-bi-division-eyes-rs-70000-cr-order-book-by-2030-125070800167_1.html"},{"businessUnit":"Civil","category":"Order Intake","competitors":["Megha Engineering"],"date":null,"excerpt":"[Skip to main content]()\n\n* [](https://twitter.com/MEIL_Group/)\n* [](https://in.linkedin.com/company/meilofficial)\n* [](https://www.instagram.com/meilcompany/)\n* [](https://www.facebook.com/meilteam.in/)\n* [](https://www.youtube.com/c/MeghaEngineeringandInfrastructuresLtd)\n\n[Subsidiaries](#)\n\n# Know","title":"MEIL Wins Landmark EPC Contract from NPCIL - Hyderabad","url":"https://meil.in/meil-wins-landmark-epc-contract-npcil"},{"businessUnit":"General","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"May 6, 2025 â TEECL has announced plans to develop hyperscale and edge data centers totaling to 250MW across India, backed by an ambitious investment plan worth US$ 1 ...Read more","title":"Techno Digital Infra plans to invest USD 1 billion ...","url":"https://w.media/techno-digital-infra-plans-to-invest-usd-1-billion-to-develop-250mw-dcs-across-india/"},{"businessUnit":"General","category":"Project Wins","competitors":["Tata Projects"],"date":"2025-12-16","excerpt":"_( December 2025 )_ _( [Learn how and when to remove this message](/wiki/Help:Maintenance_template_removal \"Help:Maintenance template removal\") )_ |\n| --- | --- |\n\n_( [Learn how and when to remove this message](/wiki/Help:Maintenance_template_removal \"Help:Maintenance template removal\") )_ |\n| --- |","title":"Tata Projects - Wikipedia","url":"https://en.wikipedia.org/wiki/Tata_Projects"},{"businessUnit":"Civil","category":"Order Intake","competitors":["Megha Engineering"],"date":null,"excerpt":"Oct 17, 2025 Â· Megha Engineering & Infrastructures Ltd (MEIL), based in Hyderabad, has won a major contract worth $225.5 million from Kuwait Oil CompanyÂ ...","title":"MEIL wins $225.5M contract from Kuwait Oil Company for gas facility","url":"https://www.linkedin.com/posts/saravjit-singh-kahlon-47146a2_engineering-epcprojects-infrastructure-activity-7385200339668336640-qNAa"},{"businessUnit":"General","category":"Financials","competitors":["Techno Electric"],"date":null,"excerpt":"Given Techno Electric's expanding footprint in data centers across key Indian markets, we are\n\nuniquely positioned to deliver end-to-end integrated solutions. As we transition from being\n\nprimarily a developer to an operator, our focus is shifting towards high-value service-led\n\nofferings such as cl","title":"âTechno Electric & Engineering Company Limited Q2 FY ' ...","url":"https://www.techno.co.in/public/uploads/2/2025-11/amsec_technoelectric_13nov_2025.pdf"},{"businessUnit":"General","category":"Financials","competitors":["Tata Projects"],"date":"2025-05-21","excerpt":"India](https://subscriptions.outlookbusiness.com/default)\n\n[Delivery outside India](https://kj2.outlookindia.com/international_subscription/international_subs1.php?source=1&vouchercode=WFHE130482)\n\n1. [home](/)\n2. [Corporate](/corporate)\n3. Tata projects to now bet on short term fast track contracts","title":"Tata Projects to Now Bet on Short-Term, Fast-Track Contracts â Outlook Business","url":"https://www.outlookbusiness.com/corporate/tata-projects-to-now-bet-on-short-term-fast-track-contracts"},{"businessUnit":"General","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"Cookie Notice\n\nWe use cookies for analytics and to improve our site. You agree to our use of cookies by closing this message box or continuing to use our site. To find out more, including how to change your settings, see our [Cookie Policy](/data-protection)\n\n[New Build](/news/category/new-build)\n\n#","title":"\n    Indiaâs MIEL Awarded EPC Contract For Kaiga-5 And -6 Nuclear Plants\n","url":"https://www.nucnet.org/news/india-s-miel-awarded-epc-contract-for-kaiga-5-and-6-nuclear-plants-4-5-2025"},{"businessUnit":"Civil","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"[View organization page for AIM]()](https://in.linkedin.com/company/analytics-india-magazine?trk=public_post_feed-actor-image)\n\n[AIM](https://in.linkedin.com/company/analytics-india-magazine?trk=public_post_feed-actor-name)\n\n323,732 followers\n\n2w\n\n* [Report this post](https://www.linkedin.com/uas/lo","title":"Techno Digital inaugurates 36MW AI-ready data centre in Chennai | AIM posted on the topic | LinkedIn","url":"https://www.linkedin.com/posts/analytics-india-magazine_techno-digital-the-digital-infrastructure-activity-7366769968740302849-50TW"},{"businessUnit":"Civil","category":"Order Intake","competitors":["Tata Projects"],"date":null,"excerpt":"Notable achievements during FY2024 were landmark\n\nprojects completed and successfully handed over,\n\nincluding the New Parliament Building, Atal Setu (MTHL),\n\nsolar manufacturing plant for First Solar Inc., several\n\nhundred kilometres of Dedicated Freight Corridor, and\n\nTrisonic Wind Tunnel for ISRO.","title":"Transforming lives. - TATA Projects Limited","url":"https://tataprojects.com/annual-report/23-24/finance-reports/Tata-Projects-Integrated-Report-2023-24.pdf"},{"businessUnit":"Civil","category":"Order Intake","competitors":["Megha Engineering"],"date":null,"excerpt":"New Delhi: Megha Engineering & Infrastructures Ltd (MEIL) ... It has received the purchase order nearly a year after it bagged the contract in June 2024.","title":"Megha Engineering secures massive â¹12800-cr NPCIL order - MSN","url":"https://www.msn.com/en-in/news/world/nuclear-newcomer-megha-engineering-secures-massive-12-800-cr-npcil-order/ar-AA1DtzS6%3Fcvid%3DA88AECF18BFF4935839D11EB2ACA7AAD%26ocid%3Dhpmsn%26apiversion%3Dv2%26noservercache%3D1%26domshim%3D1%26renderwebcomponents%3D1%26wcseo%3D1%26batchservertelemetry%3D1%26noservertelemetry%3D1"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Techno Electric"],"date":null,"excerpt":"News Â· Techno Digital unveils 36MW AI-Ready hyperscale data center in Chennai Â· T&D India; Aug 28, 2025. Techno Digital, the digital infrastructure arm of ...Read more","title":"Techno Electric Archives - Your Gateway to Power ...","url":"https://www.tndindia.com/tag/techno-electric/"},{"businessUnit":"T&D","category":"Order Intake","competitors":["Industry"],"date":null,"excerpt":"Tata Power shares in focus as company wins transmission project LoI worth Rs 156 crore. Shares of Tata Power are likely to be in focus on Friday after theÂ ...","title":"Tata Power shares in focus as company wins transmission project ...","url":"https://www.msn.com/en-in/money/markets/tata-power-shares-in-focus-as-company-wins-transmission-project-loi-worth-rs-156-crore/ar-AA1SbBhx"},{"businessUnit":"General","category":"Order Intake","competitors":["Megha Engineering"],"date":"2025-05-08","excerpt":"[](https://www.oemupdate.com)\n\n* [](https://www.facebook.com/oemupdate)\n* [](https://x.com/OEMUPDATE)\n* [](https://www.instagram.com/oemupdate/)\n* [](https://www.youtube.com/@oemupdate)\n* [](https://www.linkedin.com/showcase/oemupdatemagazine/)\n* [](https://play.google.com/store/apps/details?id=com.","title":"MEIL secures largest nuclear EPC contract from NPCIL - OEM Update","url":"https://www.oemupdate.com/news-update/meil-secures-largest-nuclear-epc-contract-from-npcil/"},{"businessUnit":"General","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"What was the revenue for KEC International Ltd in Q2 results 2024? The revenue for KEC International Ltd in the Q2 results 2024 was â¹5,119.94Cr.","title":"KEC International Ltd Results 2025 - INDmoney","url":"https://www.indmoney.com/stocks/kec-international-ltd-share-price/results"},{"businessUnit":"General","category":"Order Intake","competitors":["KEC International"],"date":"2025-11-25","excerpt":"www.icra.in\n\nPage **|** **1**\n\nSensitivity Label : Internal\n\n**November 25, 2025**\n\n**KEC International Limited: Ratings reaffirmed and assigned for enhanced amount**\n\n**Summary of rating action**\n\n**Instrument\\***\n\n**Previous rated amount**\n\n**(Rs. crore)**\n\n**Current rated amount**\n\n**(Rs.\ncrore)*","title":"[PDF] KEC International Limited: Ratings reaffirmed and assigned ... - ICRA","url":"https://www.icra.in/Rating/GetRationalReportFilePdf?id=139175"},{"businessUnit":"T&D","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"[kecindia@kecrpg.com](mailto:kecindia@kecrpg.com)\n\n[\\+91 22 66670200](tel: +91 22 66670200)\n\n* [](https://www.instagram.com/kec.intl/)\n* [](https://www.linkedin.com/company/kec-international-ltd.)\n* [](https://twitter.com/KEC_Intl)\n* [](https://www.facebook.com/KEC-International-Limited-241066525904","title":"FINANCIAL PERFORMANCE FOR QUARTER & NINE MONTHS ENDED 31 DECEMBER 2024 -  KEC International","url":"https://www.kecrpg.com/press-release/earnings/financial-performance-for-quarter-&-nine-months-ended-31-december-2024-3-feb-25"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":"2025-12-13","excerpt":"KEC International, part of RPG Group, has secured new orders worth â¹1,150 crore, marking the largest-ever order for its India Transmission ...","title":"KEC International Lands RECORD â¹1150 Cr Orders","url":"https://www.whalesbook.com/news/English/tech/AI-%E0%AA%AA%E0%AA%BE%E0%AA%B5%E0%AA%B0%E0%AA%B9%E0%AA%BE%E0%AA%89%E0%AA%B8-%E0%AA%B8%E0%AB%8D%E0%AA%9F%E0%AB%8D%E0%AA%B0%E0%AB%87%E0%AA%9F%E0%AB%87%E0%AA%9C%E0%AB%80-%E0%AA%A6%E0%AB%8D%E0%AA%B5%E0%AA%BE%E0%AA%B0%E0%AA%BE-%E0%AA%95%E0%AB%8B%E0%AA%AB%E0%AB%8B%E0%AA%B0%E0%AB%8D%E0%AA%9C%E0%AA%A8%E0%AB%80-dollar2-%E0%AA%AC%E0%AA%BF%E0%AA%B2%E0%AA%BF%E0%AA%AF%E0%AA%A8-%E0%AA%B0%E0%AB%87%E0%AA%B5%E0%AA%A8%E0%AB%8D%E0%AA%AF%E0%AB%81%E0%AA%A8%E0%AB%80-%E0%AA%AE%E0%AA%B9%E0%AA%A4%E0%AB%8D%E0%AA%B5%E0%AA%BE%E0%AA%95%E0%AA%BE%E0%AA%82%E0%AA%95%E0%AB%8D%E0%AA%B7%E0%AA%BE/693d3bee62283e6049371037"},{"businessUnit":"T&D","category":"Order Intake","competitors":["KEC International"],"date":null,"excerpt":"[kecindia@kecrpg.com](mailto:kecindia@kecrpg.com)\n\n[\\+91 22 66670200](tel: +91 22 66670200)\n\n* [](https://www.instagram.com/kec.intl/)\n* [](https://www.linkedin.com/company/kec-international-ltd.)\n* [](https://twitter.com/KEC_Intl)\n* [](https://www.facebook.com/KEC-International-Limited-241066525904","title":"KEC International wins New Orders of Rs. 1,003 crores -  KEC International","url":"https://www.kecrpg.com/press-release/orders/kec-international-wins-new-orders-of-rs.-1,003-crores-22-sep-2024"},{"businessUnit":"General","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"[kecindia@kecrpg.com](mailto:kecindia@kecrpg.com)\n\n[\\+91 22 66670200](tel: +91 22 66670200)\n\n* [](https://www.instagram.com/kec.intl/)\n* [](https://www.linkedin.com/company/kec-international-ltd.)\n* [](https://twitter.com/KEC_Intl)\n* [](https://www.facebook.com/KEC-International-Limited-241066525904","title":"Quarterly results -  KEC International","url":"https://www.kecrpg.com/quarterly-results"},{"businessUnit":"General","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"Â¡Vaya!\n ... \n[Trader Talk](https://finance.yahoo.com/videos/series/trader-talk/)\n        3. [Warrior Money](https://finance.yahoo.com/videos/series/warrior-money/)\n        4. [Living Not So Fabulously](https://finance.yahoo.com/videos/series/living-fabulously/)\n        5. [The Big Idea](https://fina","title":"KEC INTL. LIMITED (KEC.NS) Q2 24/25 earnings call transcript","url":"https://finance.yahoo.com/quote/KEC.NS/earnings/KEC.NS-Q2-2025-earnings_call-381570.html/"},{"businessUnit":"SAE","category":"Order Intake","competitors":["KEC International"],"date":"2010-09-07","excerpt":"\"Power\") âº KEC Intl to acquire US' SAE Towers for Rs 440 cr\n\n##### The Economic Times daily newspaper is available online now. [Read Today's Paper](/print_edition.cms)\n\n# KEC Intl to acquire US' SAE Towers for Rs 440 cr\n\nSECTIONS\n\nKEC Intl to acquire US' SAE Towers for Rs 440 cr\n\nET Bureau\n\nRate Sto","title":"KEC Intl to acquire US' SAE Towers for Rs 440 cr - The Economic Times","url":"https://m.economictimes.com/industry/energy/power/kec-intl-to-acquire-us-sae-towers-for-rs-440-cr/articleshow/6516026.cms"},{"businessUnit":"General","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"[Market Domination](https://finance.yahoo.com/videos/series/market-domination/)\n        6. [Market Domination Overtime](https://finance.yahoo.com/videos/series/market-domination-overtime/)\n        7. [Asking for a Trend](https://finance.yahoo.com/videos/series/asking-for-a-trend/)\n        8. [Mind Y","title":"KEC INTERNATIONAL LTD. (KEC.BO) Q3 24/25 earnings call transcript","url":"https://finance.yahoo.com/quote/KEC.BO/earnings/KEC.BO-Q3-2025-earnings_call-381569.html/"},{"businessUnit":"General","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"[kecindia@kecrpg.com](mailto:kecindia@kecrpg.com)\n\n[\\+91 22 66670200](tel: +91 22 66670200)\n\n* [](https://www.instagram.com/kec.intl/)\n* [](https://www.linkedin.com/company/kec-international-ltd.)\n* [](https://twitter.com/KEC_Intl)\n* [](https://www.facebook.com/KEC-International-Limited-241066525904","title":"Press Release -  KEC International","url":"https://www.kecrpg.com/press-release"},{"businessUnit":"Oil & Gas","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"Businesses](/emerging-businesses)\n    + [Oil & Gas Pipelines](/oil-&-gas-pipelines)\n    + [Cables](/asiancables)\n* Expertise\n  \n    + [Turnkey EPC Solutions](/turnkey-epc-solutions)\n    + [Engineering & Design](/engineering-&-design)\n    + [Manufacturing](/manufacturing)\n    + [Tower Testing](/tower","title":"KEC International wins New Orders of Rs. 1,114 crores -  KEC International","url":"https://www.kecrpg.com/press-release/orders/kec-international-wins-new-orders-of-rs.-1,114-crores-25-Nov-2024"},{"businessUnit":"Civil","category":"Financials","competitors":["KEC International"],"date":"2025-07-28","excerpt":"KEC International Limited\n\n**Corporate Presentation**\n\n**28 July 2025**\n\n**Power T & D**\n\n**Transportation**\n\n**Civil**\n\n**Renewables**\n\n**Oil & Gas Pipelines**\n\n**Cables & Conductors**\n\n2\n\n**Disclaimer**\n\nThis presentation may include statements which may constitute forward-looking statements. All ","title":"[PDF] Corporate Presentation - KEC International Limited","url":"https://www.kecrpg.com/media/corporatePresentationFilesMedia/KEC%20Corporate%20Presentation%20Q1%20FY26_2.pdf"},{"businessUnit":"General","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"Q3 FY2024 Results Conference Callâ. January 31, 2024. MANAGEMENT: MR. VIMAL KEJRIWAL â MANAGING DIRECTOR &. CHIEF. EXECUTIVE. OFFICER. â. KEC.Read more","title":"âKEC International Limited Q3 FY2024 Results Conference ...","url":"https://www.kecrpg.com/KEC%20data/Investor%20relations/presentation%20to%20analysts/KECEarningsCallTranscriptQ3FY24.pdf"},{"businessUnit":"Oil & Gas","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"Businesses](/emerging-businesses)\n    + [Oil & Gas Pipelines](/oil-&-gas-pipelines)\n    + [Cables](/asiancables)\n* Expertise\n  \n    + [Turnkey EPC Solutions](/turnkey-epc-solutions)\n    + [Engineering & Design](/engineering-&-design)\n    + [Manufacturing](/manufacturing)\n    + [Tower Testing](/tower","title":"FINANCIAL PERFORMANCE FOR QUARTER & HALF YEAR ENDED 30 SEPTEMBER 2025 -  KEC International","url":"https://www.kecrpg.com/press-release/earnings/financial-performance-for-quarter-&-half-year-ended-30-september-2025-10-11-25"},{"businessUnit":"General","category":"Order Intake","competitors":["KEC International"],"date":"2024-12-31","excerpt":"Secured New Order Worth â¹1,073 Crore. On December 30, 2024, shares of KEC International Ltd. experienced an increase of over 5% after the ...","title":"KEC International Strengthened Order Book: Secures New Contract","url":"https://www.angelone.in/news/share-market/kec-international-strengthened-order-book-secures-new-contracts"},{"businessUnit":"Civil","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"[KEC INTERNATIONAL LIMITED](/quote/stock/KEC-INTERNATIONAL-LIMITED-9058965/)\n\n[](/registration/member/?utmzb_campaign=ajouter-listes++redirect_ajouter-listes++&utmzb_content=++++&utmzb_source=redirect&utmzb_medium=url_declenchement)\n\n[Add to a list](/registration/member/?utmzb_campaign=ajouter-liste","title":"KEC International Limited: Company Events Publications and Financial Calendar | KEC | INE389H01022 | MarketScreener","url":"https://www.marketscreener.com/quote/stock/KEC-INTERNATIONAL-LIMITED-9058965/calendar/"},{"businessUnit":"Civil","category":"Financials","competitors":["KEC International"],"date":"2025-11-10","excerpt":"KEC International, a global infrastructure EPC company, has reported robust Q2 FY2024 results. Net profit jumped 88% to â¹1.61 billion, while ...","title":"KEC International Reports Strong Q2 Performance with 88% Jump ...","url":"https://scanx.trade/stock-market-news/earnings/kec-international-reports-strong-q2-performance-with-88-jump-in-net-profit/24338021"},{"businessUnit":"SAE","category":"Financials","competitors":["KEC International"],"date":"2018-05-09","excerpt":"We have audited the accompanying consolidated financial statements of SAE Towers. Holdings, LLC (a Delaware liability company) (the \"Company\") ...","title":"[PDF] SAE Towers Holdings, LLC - KEC International","url":"https://www.kecrpg.com/KEC%20data/Investor%20relations/agm/2018/SAE%20Towers%20Holdings%20LLC.pdf"},{"businessUnit":"T&D","category":"Financials","competitors":["KEC International"],"date":"2025-12-15","excerpt":"[](/)\n\nNews\n\n* [Banks](/news/banks)\n* [Blogs](/news/blog)\n* [Budget](/news/budget)\n* [Business](/news/business)\n* [Companies](/news/companies)\n* [Currency](/news/currency)\n* [Earnings](/news/earnings)\n* [Economy](/news/economy)\n\n1. [Home](/)\n2. [News](/news)\n3. [Companies](/news/companies)\n4. KEC In","title":"KEC International Bags â¹1,150 Crore Transmission and Civil Orders in India, Records Largest-Ever India T&D Win | India Infoline","url":"https://www.indiainfoline.com/news/companies/kec-international-bags-1150-crore-transmission-and-civil-orders-in-india-records-largest-ever-india-td-win"},{"businessUnit":"Oil & Gas","category":"Financials","competitors":["KEC International"],"date":null,"excerpt":"Businesses](/emerging-businesses)\n    + [Oil & Gas Pipelines](/oil-&-gas-pipelines)\n    + [Cables](/asiancables)\n* Expertise\n  \n    + [Turnkey EPC Solutions](/turnkey-epc-solutions)\n    + [Engineering & Design](/engineering-&-design)\n    + [Manufacturing](/manufacturing)\n    + [Tower Testing](/tower","title":"KEC International wins New Orders of Rs. 1073 crores -  KEC International","url":"https://www.kecrpg.com/press-release/orders/kec-international-wins-new-orders-of-rs.-1073-crores-30-dec-24"}];
+        const byCompetitor = {"ABB India":7,"Adani Transmission":1,"Afcons Infrastructure":3,"GE Vernova":1,"HCC":1,"IRCON International":9,"Industry":16,"KEC International":42,"Kalpataru Projects":11,"L&T":5,"Megha Engineering":6,"NCC Limited":4,"Power Grid Corporation":6,"RVNL":5,"Siemens India":3,"Sterling Wilson":2,"Sterlite Power":6,"Tata Projects":6,"Techno Electric":5,"Transrail Lighting":6};
+        const byCategory = {"Financials":49,"M&A":1,"Operations":6,"Order Intake":59,"Project Wins":5};
+        const byBusinessUnit = {"Civil":18,"General":46,"Oil & Gas":4,"Railways":7,"Renewables":6,"SAE":3,"T&D":36};
+        
+        // Populate competitor filter
+        const competitorSelect = document.getElementById('filterCompetitor');
+        Object.keys(byCompetitor).sort().forEach(comp => {
+            const option = document.createElement('option');
+            option.value = comp;
+            option.textContent = comp + ' (' + byCompetitor[comp] + ')';
+            competitorSelect.appendChild(option);
+        });
+        
+        // Chart colors
+        const chartColors = [
+            '#58a6ff', '#3fb950', '#d29922', '#a371f7', '#f85149',
+            '#79c0ff', '#56d364', '#e3b341', '#bc8cff', '#ff7b72',
+            '#a5d6ff', '#7ee787', '#f2cc60', '#d2a8ff', '#ffa198'
+        ];
+        
+        // Create Competitor Chart
+        const competitorCtx = document.getElementById('competitorChart').getContext('2d');
+        const topCompetitors = Object.entries(byCompetitor)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 12);
+        
+        new Chart(competitorCtx, {
+            type: 'bar',
+            data: {
+                labels: topCompetitors.map(c => c[0]),
+                datasets: [{
+                    label: 'Articles',
+                    data: topCompetitors.map(c => c[1]),
+                    backgroundColor: chartColors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#30363d' },
+                        ticks: { color: '#8b949e' }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#e6edf3' }
+                    }
+                }
+            }
+        });
+        
+        // Create Category Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(byCategory),
+                datasets: [{
+                    data: Object.values(byCategory),
+                    backgroundColor: chartColors.slice(0, Object.keys(byCategory).length),
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { color: '#e6edf3', padding: 12 }
+                    }
+                }
+            }
+        });
+        
+        // Create Business Unit Chart
+        const buCtx = document.getElementById('buChart').getContext('2d');
+        new Chart(buCtx, {
+            type: 'polarArea',
+            data: {
+                labels: Object.keys(byBusinessUnit),
+                datasets: [{
+                    data: Object.values(byBusinessUnit),
+                    backgroundColor: chartColors.slice(0, Object.keys(byBusinessUnit).length).map(c => c + '80'),
+                    borderColor: chartColors.slice(0, Object.keys(byBusinessUnit).length),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { color: '#e6edf3', padding: 12 }
+                    }
+                },
+                scales: {
+                    r: {
+                        grid: { color: '#30363d' },
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+        
+        // Generate category sections
+        function generateCategorySections() {
+            const container = document.getElementById('categorySections');
+            const categories = ['Order Intake', 'Financials', 'Project Wins', 'Operations', 'M&A', 'Regulatory', 'Leadership'];
+            const icons = {
+                'Order Intake': 'ð',
+                'Financials': 'ð°',
+                'Project Wins': 'ð',
+                'Operations': 'âï¸',
+                'M&A': 'ð¤',
+                'Regulatory': 'ð',
+                'Leadership': 'ð'
+            };
+            const iconClasses = {
+                'Order Intake': 'orders',
+                'Financials': 'financials',
+                'Project Wins': 'projects',
+                'Operations': 'operations',
+                'M&A': 'ma',
+                'Regulatory': 'regulatory',
+                'Leadership': 'leadership'
+            };
+            
+            container.innerHTML = '';
+            
+            categories.forEach(category => {
+                const categoryNews = newsData.filter(n => n.category === category).slice(0, 5);
+                if (categoryNews.length === 0) return;
+                
+                const section = document.createElement('div');
+                section.className = 'news-section';
+                section.innerHTML = `
+                    <div class="news-section-header">
+                        <div class="category-icon ${iconClasses[category]}">${icons[category]}</div>
+                        <div>
+                            <div class="section-title" style="margin-bottom: 0;">
+                                ${category}
+                                <span class="badge">${byCategory[category] || 0} articles</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-list">
+                        ${categoryNews.map(n => renderNewsItem(n)).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+        }
+        
+        function renderNewsItem(news) {
+            const dateStr = news.date ? new Date(news.date).toLocaleDateString() : '';
+            return `
+                <div class="news-item">
+                    <div class="news-item-header">
+                        <a href="${news.url}" target="_blank" class="news-title">${news.title}</a>
+                        <span class="news-date">${dateStr}</span>
+                    </div>
+                    <div class="news-meta">
+                        ${news.competitors.map(c => `<span class="tag competitor">${c}</span>`).join('')}
+                        <span class="tag bu">${news.businessUnit}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Filter and display news
+        function filterNews() {
+            const buFilter = document.getElementById('filterBU').value;
+            const compFilter = document.getElementById('filterCompetitor').value;
+            const catFilter = document.getElementById('filterCategory').value;
+            
+            let filtered = newsData;
+            
+            if (buFilter) {
+                filtered = filtered.filter(n => n.businessUnit === buFilter);
+            }
+            if (compFilter) {
+                filtered = filtered.filter(n => n.competitors.includes(compFilter));
+            }
+            if (catFilter) {
+                filtered = filtered.filter(n => n.category === catFilter);
+            }
+            
+            document.getElementById('resultsCount').textContent = `Showing ${filtered.length} of ${newsData.length} articles`;
+            
+            const container = document.getElementById('allNewsList');
+            container.innerHTML = filtered.map(n => renderNewsItem(n)).join('');
+        }
+        
+        // Tab switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Scan news (placeholder for API integration)
+        function scanNews() {
+            const days = document.getElementById('daysLookback').value;
+            alert('Scanning news for the last ' + days + ' days...\n\nNote: In production, this would trigger a live API call to fetch the latest news. Currently displaying pre-loaded research data.');
+        }
+        
+        // Refresh data
+        function refreshData() {
+            location.reload();
+        }
+        
+        // Initialize
+        generateCategorySections();
+        filterNews();
+    </script>
+</body>
+</html>
